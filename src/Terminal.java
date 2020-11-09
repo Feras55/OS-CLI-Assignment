@@ -60,11 +60,22 @@ public class Terminal {
         return true;
     }
 
+    public boolean ls(){
+        File currentDirectory = new File(currentPath);
+        String[] directories = currentDirectory.list();
+        for (String sub: directories){
+            System.out.println(sub);
+        }
+        return  true;
+
+    }
+
     public static void main(String[] args){
         Terminal t = new Terminal();
-        System.out.println(t.mkdir("D:\\demo1\\"));
-        System.out.println(t.mkdir("demo1\\demo2\\"));
-        System.out.println(t.mkdir("demo1\\demo3"));
-        System.out.println(t.touch("demo1\\demo2\\demofile1.txt"));
+        t.mkdir("D:\\demo1\\");
+        t.mkdir("demo1\\demo2\\");
+        t.mkdir("demo1\\demo3");
+        t.ls();
+        t.touch("demo1\\demo2\\demofile1.txt");
     }
 }
