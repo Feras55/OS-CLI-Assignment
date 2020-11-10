@@ -88,35 +88,46 @@ public class Terminal {
 
     public boolean cd(String destinationSubDirectory)
     {
-        if(destinationSubDirectory.equals(".."))
-        {
+        if(destinationSubDirectory.equals("..")) {
             int numberOfDirectoriesInPath = paths.size();
-            if(numberOfDirectoriesInPath>1){
-                paths.remove(numberOfDirectoriesInPath);
+            if (numberOfDirectoriesInPath > 1) {
+                paths.remove(numberOfDirectoriesInPath-1);
+            }
+            return true;
+        }
+
+            File dir = new File(destinationSubDirectory);
+        if(dir.isAbsolute()){
+                if(dir.exists())
+                {
+                        paths.clear();
+                        String[] arr = destinationSubDirectory.split(Pattern.quote("\\"));
+                        for (String sub : arr) {
+                            paths.add(sub);
+                    }
+
+
+                }else{
+                System.out.println("No such file or directory");
+                return  false;
             }
 
-            return  true;
-        }
-        File dir = new File(destinationSubDirectory);
-        try {
-            if(dir.exists()) {
-
-                if (dir.isAbsolute()) {
-                    paths.clear();
-                }
-                String[] arr = destinationSubDirectory.split(Pattern.quote("//"));
-                for (String sub :
-                        arr) {
-                    paths.add(sub);
-
+        }else{
+            String curPath = pathGenerator();
+            curPath+=destinationSubDirectory;
+            dir = new File(curPath);
+                if(dir.exists()) {
+                    paths.add(destinationSubDirectory);
                 }
 
-            }
-            return  true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return  false;
+                else{
+                System.out.println("No such file or directory");
+                return  false;
+                }
+
         }
+
+        return  true;
     }
 
     public static void main(String[] args){
@@ -126,12 +137,12 @@ public class Terminal {
         t.mkdir("demo1\\demo3");
         t.ls();
         System.out.println("----------------");
-        t.cd("demo1");
+        System.out.println(t.cd("demo1"));
         t.ls();
         System.out.println("----------------");
         t.cd("..");
         t.ls();
-
-//        t.touch("demo2\\demofile1.txt");
+        t.cd("demo1");
+        t.touch("demo2\\demofile1.txt");
     }
 }
