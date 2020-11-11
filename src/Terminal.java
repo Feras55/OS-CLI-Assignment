@@ -1,5 +1,7 @@
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Terminal {
@@ -17,6 +19,7 @@ public class Terminal {
         }
         return  curPath;
     }
+
     private File makeFile(String destinationPath){
         File file = new File(destinationPath);
         if (!file.isAbsolute()){
@@ -49,6 +52,20 @@ public class Terminal {
         }
         file.delete();
     }
+    public static void clear() {
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            }
+            else {
+                System.out.print("\033\143");
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+
     public boolean rmdir(String destinationPath){
         File file = makeFile(destinationPath);
 
@@ -129,20 +146,20 @@ public class Terminal {
 
         return  true;
     }
+    public void pwd(){
+        String curPath;
+        curPath = pathGenerator();
+        if(paths.size()!=1)
+        {
+            System.out.println(curPath.substring(0,curPath.length()-1));
+        }
+        else{
+
+            System.out.println(curPath);
+        }
+    }
 
     public static void main(String[] args){
-        Terminal t = new Terminal();
-        t.mkdir("D:\\demo1\\");
-        t.mkdir("demo1\\demo2\\");
-        t.mkdir("demo1\\demo3");
-        t.ls();
-        System.out.println("----------------");
-        System.out.println(t.cd("demo1"));
-        t.ls();
-        System.out.println("----------------");
-        t.cd("..");
-        t.ls();
-        t.cd("demo1");
-        t.touch("demo2\\demofile1.txt");
+
     }
 }
