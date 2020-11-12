@@ -70,6 +70,10 @@ public class Terminal {
 
     }
 
+    public boolean ls(String destinationPath){
+        return false;
+    }
+
     public static void main(String[] args){
         Terminal t = new Terminal();
         t.mkdir("D:\\demo1\\");
@@ -77,5 +81,9 @@ public class Terminal {
         t.mkdir("demo1\\demo3");
         t.ls();
         t.touch("demo1\\demo2\\demofile1.txt");
+
+        t.ls();
+        t.ls();
+        t.ls("demo1");
     }
 }
