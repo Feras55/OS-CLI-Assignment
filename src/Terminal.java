@@ -159,7 +159,10 @@ public class Terminal {
         }
     }
 
+    public boolean ls(String destinationPath){
+        return false;
+    }
+
     public static void main(String[] args){
 
-    }
 }
