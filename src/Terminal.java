@@ -11,40 +11,39 @@ public class Terminal {
         paths.add("D:");
     }
 
-    private String pathGenerator(){
+    private String pathGenerator() {
         String curPath = "";
-        for (String dir: paths) {
-            curPath+=(dir + '\\');
+        for (String dir : paths) {
+            curPath += (dir + '\\');
 
         }
-        return  curPath;
+        return curPath;
     }
 
-    private File makeFile(String destinationPath){
+    private File makeFile(String destinationPath) {
         File file = new File(destinationPath);
-        if (!file.isAbsolute()){
+        if (!file.isAbsolute()) {
             String curPath = pathGenerator();
             file = new File(curPath, destinationPath);
         }
         return file;
     }
 
-    public boolean mkdir(String destinationPath){
+    public boolean mkdir(String destinationPath) {
         File file = makeFile(destinationPath);
 
         try {
             if (!file.mkdir()) return false;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return false;
         }
         return true;
     }
 
-    static void deleteFolder(File file){
+    static void deleteFolder(File file) {
         for (File sub : file.listFiles()) {
-            if(sub.isDirectory()) {
+            if (sub.isDirectory()) {
                 deleteFolder(sub);
             } else {
                 sub.delete();
@@ -52,12 +51,12 @@ public class Terminal {
         }
         file.delete();
     }
+
     public static void clear() {
         try {
             if (System.getProperty("os.name").contains("Windows")) {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            }
-            else {
+            } else {
                 System.out.print("\033\143");
             }
         } catch (Exception e) {
@@ -66,103 +65,95 @@ public class Terminal {
     }
 
 
-    public boolean rmdir(String destinationPath){
+    public boolean rmdir(String destinationPath) {
         File file = makeFile(destinationPath);
 
-        try{
+        try {
             deleteFolder(file);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return false;
         }
         return true;
     }
 
-    public boolean touch(String destinationPath){
+    public boolean touch(String destinationPath) {
         File file = makeFile(destinationPath);
 
         try {
             if (!file.createNewFile()) return false;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return false;
         }
         return true;
     }
 
-    public void ls(){
+    public void ls() {
         String curPath = pathGenerator();
         File currentDirectory = new File(curPath);
         String[] directories = currentDirectory.list();
-        for (String sub: directories){
+        for (String sub : directories) {
             System.out.println(sub);
         }
         return;
 
     }
 
-    public boolean cd(String destinationSubDirectory)
-    {
-        if(destinationSubDirectory.equals("..")) {
+    public boolean cd(String destinationSubDirectory) {
+        if (destinationSubDirectory.equals("..")) {
             int numberOfDirectoriesInPath = paths.size();
             if (numberOfDirectoriesInPath > 1) {
-                paths.remove(numberOfDirectoriesInPath-1);
+                paths.remove(numberOfDirectoriesInPath - 1);
             }
             return true;
         }
 
-            File dir = new File(destinationSubDirectory);
-        if(dir.isAbsolute()){
-                if(dir.exists())
-                {
-                        paths.clear();
-                        String[] arr = destinationSubDirectory.split(Pattern.quote("\\"));
-                        for (String sub : arr) {
-                            paths.add(sub);
-                    }
+        File dir = new File(destinationSubDirectory);
+        if (dir.isAbsolute()) {
+            if (dir.exists()) {
+                paths.clear();
+                String[] arr = destinationSubDirectory.split(Pattern.quote("\\"));
+                for (String sub : arr) {
+                    paths.add(sub);
+                }
 
 
-                }else{
+            } else {
                 System.out.println("No such file or directory");
-                return  false;
+                return false;
             }
 
-        }else{
+        } else {
             String curPath = pathGenerator();
-            curPath+=destinationSubDirectory;
+            curPath += destinationSubDirectory;
             dir = new File(curPath);
-                if(dir.exists()) {
-                    paths.add(destinationSubDirectory);
-                }
-
-                else{
+            if (dir.exists()) {
+                paths.add(destinationSubDirectory);
+            } else {
                 System.out.println("No such file or directory");
-                return  false;
-                }
+                return false;
+            }
 
         }
 
-        return  true;
+        return true;
     }
-    public void pwd(){
+
+    public void pwd() {
         String curPath;
         curPath = pathGenerator();
-        if(paths.size()!=1)
-        {
-            System.out.println(curPath.substring(0,curPath.length()-1));
-        }
-        else{
+        if (paths.size() != 1) {
+            System.out.println(curPath.substring(0, curPath.length() - 1));
+        } else {
 
             System.out.println(curPath);
         }
     }
 
-    public boolean ls(String destinationPath){
+    public boolean ls(String destinationPath) {
         return false;
     }
-
-    public static void main(String[] args){
-
 }
+
+
