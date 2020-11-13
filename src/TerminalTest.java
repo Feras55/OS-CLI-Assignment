@@ -1,16 +1,15 @@
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.File;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TerminalTest {
     private Terminal terminal;
     private File file;
 
-    @Before
+    @BeforeEach
     public void setup(){
         terminal = new Terminal();
         // Creating files and directories used during testing
@@ -35,7 +34,11 @@ public class TerminalTest {
     public void testMkdirCurrentDir(){
         // tests making the new directory in the current directory given its name only
         String dir = "new-dir";
-        terminal.mkdir(dir);
+        try {
+            terminal.mkdir(dir);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         file = new File("D:\\new-dir");
         assertTrue(file.exists());
         file.delete();
@@ -45,7 +48,11 @@ public class TerminalTest {
     public void testMkdirRelativePath(){
         // tests making the new directory given a relative path
         String dirPath = "./dir1/sub-dir1/new-dir";
-        terminal.mkdir(dirPath);
+        try {
+            terminal.mkdir(dirPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         file = new File("D:\\dir1\\sub-dir1\\new-dir");
         assertTrue(file.exists());
         file.delete();
@@ -55,26 +62,51 @@ public class TerminalTest {
     public void testMkdirAbsolutePath(){
         // tests making the new direcotry given an absolute path
         String dirPath = "D:\\dir1\\sub-dir2\\new-dir";
-        terminal.mkdir(dirPath);
+        try {
+            terminal.mkdir(dirPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         file = new File("D:\\dir1\\sub-dir2\\new-dir");
         assertTrue(file.exists());
         file.delete();
     }
 
     @Test
-    public void testMkdirPathNotExist(){
-        // test making a directory with invalid path
-        String dirPath = "./none/new-dir";
-        assertFalse(terminal.mkdir(dirPath));
-        file = new File("D:\\none\\new-dir");
-        assertFalse(file.exists());
+    public void testMkdirPathNotExist() {
+        String dirPath = "";
+        Exception exception = assertThrows(Exception.class, () -> {
+            terminal.mkdir(dirPath);
+        });
+
+        String expectedMessage = "cannot create directory ‘’: No such file or directory";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void testMkdirAlreadyExists() {
+        String dirPath = "./dir1";
+        Exception exception = assertThrows(Exception.class, () -> {
+            terminal.mkdir(dirPath);
+        });
+
+        String expectedMessage = "cannot create directory ‘./dir1’: File exists";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
     public void testRmdirCurrentDir(){
         // tests deleting directory in the current directory given its name only
         String dir = "dir";
-        terminal.rmdir(dir);
+        try {
+            terminal.rmdir(dir);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         file = new File("D:\\dir");
         assertFalse(file.exists());
     }
@@ -83,7 +115,11 @@ public class TerminalTest {
     public void testRmdirRelativePath(){
         // tests deleting directory given a relative path
         String dirPath = "./dir1/sub-dir1/";
-        terminal.rmdir(dirPath);
+        try {
+            terminal.rmdir(dirPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         file = new File("D:\\dir1\\sub-dir1");
         assertFalse(file.exists());
     }
@@ -92,27 +128,40 @@ public class TerminalTest {
     public void testRmdirAbsolutePath(){
         // tests deleting directory given an absolute path
         String dirPath = "D:\\dir1\\sub-dir2";
-        terminal.rmdir(dirPath);
+        try {
+            terminal.rmdir(dirPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         file = new File("D:\\dir1\\sub-dir2");
         assertFalse(file.exists());
     }
 
     @Test
-    public void testRmdirPathNotExist(){
+    public void testRmdirPathNotExist() {
         // test removing a directory which doesn't exist
-        String dirPath = "./none";
-        assertFalse(terminal.rmdir(dirPath));
-        file = new File("D:\\none");
-        assertFalse(file.exists());
+        String dirPath = "";
+        Exception exception = assertThrows(Exception.class, () -> {
+            terminal.rmdir(dirPath);
+        });
+
+        String expectedMessage = "failed to remove '': No such file or directory";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
-    public void testRmdirNotDir(){
-        // test removing a directory which doesn't exist
+    public void testRmdirNotDir() {
         String dirPath = "./dir1/sub-dir1/file.txt";
-        assertFalse(terminal.rmdir(dirPath));
-        file = new File("D:\\dir1\\sub-dir1\\file.txt");
-        assertTrue(file.exists());
+        Exception exception = assertThrows(Exception.class, () -> {
+            terminal.rmdir(dirPath);
+        });
+
+        String expectedMessage = "failed to remove './dir1/sub-dir1/file.txt': Not a directory";
+        String actualMessage = exception.getMessage();
+        System.out.println(actualMessage);
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -173,7 +222,7 @@ public class TerminalTest {
         }
     }
 
-    @After
+    @AfterEach
     public void teardown(){
         // Deleting files and directories used during testing
         file = new File("D:\\dir1\\sub-dir1\\file.txt"); file.delete();

@@ -26,9 +26,14 @@ public class Terminal {
         return file;
     }
 
-    public boolean mkdir(String destinationPath) {
+    public boolean mkdir(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
-        if (!file.getParentFile().exists()) return false;
+
+        if (destinationPath.length() == 0 || !file.getParentFile().exists())
+            throw new Exception(String.format("cannot create directory ‘%s’: No such file or directory", destinationPath));
+        if (file.exists())
+            throw new Exception(String.format("cannot create directory ‘%s’: File exists", destinationPath));
+
         try {
             if (!file.mkdir()) return false;
         } catch (Exception e) {
@@ -61,9 +66,13 @@ public class Terminal {
         file.delete();
     }
 
-    public boolean rmdir(String destinationPath) {
+    public boolean rmdir(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
-        if (!file.exists() || !file.isDirectory()) return false;
+        if (destinationPath.length() == 0 || !file.exists())
+            throw new Exception(String.format("failed to remove '%s': No such file or directory", destinationPath));
+        if (!file.isDirectory())
+            throw new Exception(String.format("failed to remove '%s': Not a directory", destinationPath));
+
         try {
             deleteFolder(file);
         } catch (Exception e) {
