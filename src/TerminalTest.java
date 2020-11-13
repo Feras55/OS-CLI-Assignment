@@ -3,6 +3,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -17,6 +21,7 @@ public class TerminalTest {
         try {
             file = new File("D:\\dir1\\sub-dir1"); file.mkdirs();
             file = new File("D:\\dir1\\sub-dir1\\file.txt"); file.createNewFile();
+            file = new File("D:\\dir1\\sub-dir1\\file2.txt"); file.createNewFile();
             file = new File("D:\\dir1\\sub-dir2"); file.mkdirs();
             file = new File("D:\\dir1\\sub-dir2\\file.txt"); file.createNewFile();
             file = new File("D:\\dir2\\sub-dir1"); file.mkdirs();
@@ -173,10 +178,31 @@ public class TerminalTest {
         }
     }
 
+    @Test
+    public  void testCat() throws IOException {
+        String Content1 = "This is the first file\n";
+        String Content2 = "This is the second file\n";
+        ArrayList<String>ans = new ArrayList<>();
+        ans.add(Content1);
+        ans.add(Content2);
+        Path path1 = Path.of("D:\\dir1\\sub-dir1\\file.txt");
+        Path path2 = Path.of("D:\\dir1\\sub-dir1\\file2.txt");
+        Files.writeString(path1,Content1);
+        Files.writeString(path2,Content2);
+        ArrayList<String> files = new ArrayList<>();
+        files.add("D:\\dir1\\sub-dir1\\file.txt");
+        files.add("D:\\dir1\\sub-dir1\\file2.txt");
+        for (int i = 0; i < 2; i++) {
+
+            assertEquals(ans.get(i), terminal.cat(files).get(i));
+        }
+    }
+
     @After
     public void teardown(){
         // Deleting files and directories used during testing
         file = new File("D:\\dir1\\sub-dir1\\file.txt"); file.delete();
+        file = new File("D:\\dir1\\sub-dir1\\file2.txt"); file.delete();
         file = new File("D:\\dir1\\sub-dir1"); file.delete();
         file = new File("D:\\dir1\\sub-dir2\\file.txt"); file.delete();
         file = new File("D:\\dir1\\sub-dir2"); file.delete();
