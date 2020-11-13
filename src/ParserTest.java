@@ -7,7 +7,7 @@ public class ParserTest {
     private Parser parser;
 
     @Before
-    public void setUp(){
+    public void setup(){
         parser = new Parser();
     }
 

@@ -1,29 +1,26 @@
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Terminal {
-    ArrayList<String> paths = new ArrayList<String>();
+    Path currentPath;
 
     public Terminal() {
-        paths.add("D:");
+        currentPath = Paths.get("D:\\");
     }
 
-    private String pathGenerator() {
-        String curPath = "";
-        for (String dir : paths) {
-            curPath += (dir + '\\');
-
-        }
-        return curPath;
+    public Path getCurrentPath() {
+        return currentPath;
     }
 
     private File makeFile(String destinationPath) {
         File file = new File(destinationPath);
         if (!file.isAbsolute()) {
-            String curPath = pathGenerator();
+            String curPath = getCurrentPath().toString();
             file = new File(curPath, destinationPath);
         }
         return file;
@@ -31,7 +28,7 @@ public class Terminal {
 
     public boolean mkdir(String destinationPath) {
         File file = makeFile(destinationPath);
-
+        if (!file.getParentFile().exists()) return false;
         try {
             if (!file.mkdir()) return false;
         } catch (Exception e) {
@@ -39,17 +36,6 @@ public class Terminal {
             return false;
         }
         return true;
-    }
-
-    static void deleteFolder(File file) {
-        for (File sub : file.listFiles()) {
-            if (sub.isDirectory()) {
-                deleteFolder(sub);
-            } else {
-                sub.delete();
-            }
-        }
-        file.delete();
     }
 
     public static void clear() {
@@ -64,10 +50,20 @@ public class Terminal {
         }
     }
 
+    static void deleteFolder(File file) {
+        for (File sub : file.listFiles()) {
+            if (sub.isDirectory()) {
+                deleteFolder(sub);
+            } else {
+                sub.delete();
+            }
+        }
+        file.delete();
+    }
 
     public boolean rmdir(String destinationPath) {
         File file = makeFile(destinationPath);
-
+        if (!file.exists() || !file.isDirectory()) return false;
         try {
             deleteFolder(file);
         } catch (Exception e) {
@@ -79,7 +75,7 @@ public class Terminal {
 
     public boolean touch(String destinationPath) {
         File file = makeFile(destinationPath);
-
+        if (!file.getParentFile().exists() || file.isDirectory()) return false;
         try {
             if (!file.createNewFile()) return false;
         } catch (Exception e) {
@@ -89,70 +85,29 @@ public class Terminal {
         return true;
     }
 
-    public void ls() {
-        String curPath = pathGenerator();
-        File currentDirectory = new File(curPath);
-        String[] directories = currentDirectory.list();
-        for (String sub : directories) {
-            System.out.println(sub);
-        }
-        return;
+    public File[] ls() {
+        File file = new File(getCurrentPath().toString());
+        return file.listFiles();
+    }
 
+    public File[] ls(String destinationPath) {
+        File file = makeFile(destinationPath);
+        return file.listFiles();
     }
 
     public boolean cd(String destinationSubDirectory) {
-        if (destinationSubDirectory.equals("..")) {
-            int numberOfDirectoriesInPath = paths.size();
-            if (numberOfDirectoriesInPath > 1) {
-                paths.remove(numberOfDirectoriesInPath - 1);
-            }
-            return true;
-        }
-
-        File dir = new File(destinationSubDirectory);
-        if (dir.isAbsolute()) {
-            if (dir.exists()) {
-                paths.clear();
-                String[] arr = destinationSubDirectory.split(Pattern.quote("\\"));
-                for (String sub : arr) {
-                    paths.add(sub);
-                }
-
-
-            } else {
-                System.out.println("No such file or directory");
-                return false;
-            }
-
-        } else {
-            String curPath = pathGenerator();
-            curPath += destinationSubDirectory;
-            dir = new File(curPath);
-            if (dir.exists()) {
-                paths.add(destinationSubDirectory);
-            } else {
-                System.out.println("No such file or directory");
-                return false;
-            }
-
-        }
-
+        File file = makeFile(destinationSubDirectory);
+        currentPath = Paths.get(file.getAbsolutePath()).normalize();
         return true;
     }
 
-    public void pwd() {
-        String curPath;
-        curPath = pathGenerator();
-        if (paths.size() != 1) {
-            System.out.println(curPath.substring(0, curPath.length() - 1));
-        } else {
-
-            System.out.println(curPath);
-        }
+    public String pwd() {
+        return getCurrentPath().toString();
     }
 
-    public boolean ls(String destinationPath) {
-        return false;
+    public static void main(String args[]){
+        Terminal terminal = new Terminal();
+        System.out.println(terminal.cd("./downloads/books/../../games"));
     }
 }
 
