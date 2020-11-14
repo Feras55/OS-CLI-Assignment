@@ -39,7 +39,7 @@ public class Terminal {
         try {
             if (!file.mkdir()) return false;
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -54,7 +54,7 @@ public class Terminal {
                 System.out.print("\033\143");
             }
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -71,10 +71,10 @@ public class Terminal {
             if (!file.delete())
                 return false;
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return false;
         }
-        return true;
+        return false;
     }
 
     // REQUIRES: Path must be valid
@@ -87,7 +87,7 @@ public class Terminal {
         try {
             if (!file.createNewFile()) return false;
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return false;
         }
         return true;
