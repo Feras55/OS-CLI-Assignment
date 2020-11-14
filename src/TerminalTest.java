@@ -29,6 +29,7 @@ public class TerminalTest {
         }
     }
 
+
     @Test
     public void testMkdirCurrentDir() throws Exception {
         // tests making the new directory in the current directory given its name only
@@ -200,6 +201,16 @@ public class TerminalTest {
         for (int i = 0; i < 2; ++i){
             assertEquals(files[i].toString(), terminal.ls()[i].toString());
         }
+        file = new File("D:\\dir1\\sub-dir1\\file.txt");
+        assertEquals(terminal.ls("D:\\dir1\\sub-dir1\\file.txt")[0].toString(), file.toString());
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            terminal.ls("./none/dir");
+        });
+
+        String expectedMessage = "cannot access './none/dir': No such file or directory";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -210,6 +221,7 @@ public class TerminalTest {
             assertEquals(files[i].toString(), terminal.ls("D:\\dir1")[i].toString());
         }
     }
+
 
 
 
