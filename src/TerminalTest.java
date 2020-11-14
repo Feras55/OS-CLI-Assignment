@@ -23,7 +23,6 @@ public class TerminalTest {
             file = new File("D:\\dir2\\sub-dir2"); file.mkdirs();
             file = new File("D:\\dir2\\sub-dir2\\file.txt"); file.createNewFile();
             file = new File("D:\\dir"); file.mkdirs();
-            file = new File("D:\\file.txt"); file.createNewFile();
         }
         catch(Exception e){
             System.out.println(e);
@@ -31,42 +30,30 @@ public class TerminalTest {
     }
 
     @Test
-    public void testMkdirCurrentDir(){
+    public void testMkdirCurrentDir() throws Exception {
         // tests making the new directory in the current directory given its name only
         String dir = "new-dir";
-        try {
-            terminal.mkdir(dir);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        terminal.mkdir(dir);
         file = new File("D:\\new-dir");
         assertTrue(file.exists());
         file.delete();
     }
 
     @Test
-    public void testMkdirRelativePath(){
+    public void testMkdirRelativePath() throws Exception {
         // tests making the new directory given a relative path
         String dirPath = "./dir1/sub-dir1/new-dir";
-        try {
-            terminal.mkdir(dirPath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        terminal.mkdir(dirPath);
         file = new File("D:\\dir1\\sub-dir1\\new-dir");
         assertTrue(file.exists());
         file.delete();
     }
 
     @Test
-    public void testMkdirAbsolutePath(){
+    public void testMkdirAbsolutePath() throws Exception {
         // tests making the new direcotry given an absolute path
         String dirPath = "D:\\dir1\\sub-dir2\\new-dir";
-        try {
-            terminal.mkdir(dirPath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        terminal.mkdir(dirPath);
         file = new File("D:\\dir1\\sub-dir2\\new-dir");
         assertTrue(file.exists());
         file.delete();
@@ -99,41 +86,29 @@ public class TerminalTest {
     }
 
     @Test
-    public void testRmdirCurrentDir(){
+    public void testRmdirCurrentDir() throws Exception {
         // tests deleting directory in the current directory given its name only
         String dir = "dir";
-        try {
-            terminal.rmdir(dir);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        terminal.rmdir(dir);
         file = new File("D:\\dir");
         assertFalse(file.exists());
     }
 
     @Test
-    public void testRmdirRelativePath(){
+    public void testRmdirRelativePath() throws Exception {
         // tests deleting directory given a relative path
-        String dirPath = "./dir1/sub-dir1/";
-        try {
-            terminal.rmdir(dirPath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        file = new File("D:\\dir1\\sub-dir1");
+        String dirPath = "./dir";
+        terminal.rmdir(dirPath);
+        file = new File("D:\\dir");
         assertFalse(file.exists());
     }
 
     @Test
-    public void testRmdirAbsolutePath(){
+    public void testRmdirAbsolutePath() throws Exception {
         // tests deleting directory given an absolute path
-        String dirPath = "D:\\dir1\\sub-dir2";
-        try {
-            terminal.rmdir(dirPath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        file = new File("D:\\dir1\\sub-dir2");
+        String dirPath = "D:\\dir";
+        terminal.rmdir(dirPath);
+        file = new File("D:\\dir");
         assertFalse(file.exists());
     }
 
@@ -160,19 +135,25 @@ public class TerminalTest {
 
         String expectedMessage = "failed to remove './dir1/sub-dir1/file.txt': Not a directory";
         String actualMessage = exception.getMessage();
-        System.out.println(actualMessage);
+
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
-    public void testTouch(){
+    public void testTouch() throws Exception {
         // tests creating a new file
         String dirPath1 = "./dir1/sub-dir1/new-file.txt";
         String dirPath2 = "D:\\new-file.txt";
         String dirPath3 = "D:\\none\\file.txt";
         assertTrue(terminal.touch(dirPath1));
         assertTrue(terminal.touch(dirPath2));
-        assertFalse(terminal.touch(dirPath3));
+        Exception exception = assertThrows(Exception.class, () -> {
+            terminal.touch(dirPath3);
+        });
+
+        String expectedMessage = "cannot touch 'D:\\none\\file.txt': No such file or directory";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
         file = new File("D:\\dir1\\sub-dir1\\new-file.txt");
         assertTrue(file.exists());
         file.delete();
@@ -184,7 +165,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testCd(){
+    public void testCd() throws Exception {
         assertEquals(terminal.getCurrentPath().toString(), "D:\\");
         terminal.cd("D:\\dir1\\sub-dir1");
         assertEquals(terminal.getCurrentPath().toString(), "D:\\dir1\\sub-dir1");
@@ -192,10 +173,18 @@ public class TerminalTest {
         assertEquals(terminal.getCurrentPath().toString(), "D:\\dir1\\sub-dir2");
         terminal.cd("../../dir2/sub-dir1");
         assertEquals(terminal.getCurrentPath().toString(), "D:\\dir2\\sub-dir1");
+        Exception exception = assertThrows(Exception.class, () -> {
+                terminal.cd("./none/dir");
+        });
+
+        String expectedMessage = "./none/dir: No such file or directory";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+
     }
 
     @Test
-    public void testPwd(){
+    public void testPwd() throws Exception {
         assertEquals(terminal.pwd(), "D:\\");
         terminal.cd("dir1/sub-dir2");
         assertEquals(terminal.pwd(), "D:\\dir1\\sub-dir2");
@@ -204,7 +193,7 @@ public class TerminalTest {
     }
 
     @Test
-    public void testLs(){
+    public void testLs() throws Exception {
         terminal.cd("dir1");
         File file1 = new File("D:\\dir1\\sub-dir1"), file2 = new File("D:\\dir1\\sub-dir2");
         File[] files = {file1 , file2};
@@ -214,13 +203,15 @@ public class TerminalTest {
     }
 
     @Test
-    public void testLsDifferentDir(){
+    public void testLsDifferentDir() throws Exception {
         File file1 = new File("D:\\dir1\\sub-dir1"), file2 = new File("D:\\dir1\\sub-dir2");
         File[] files = {file1 , file2};
         for (int i = 0; i < 2; ++i){
             assertEquals(files[i].toString(), terminal.ls("D:\\dir1")[i].toString());
         }
     }
+
+
 
     @AfterEach
     public void teardown(){

@@ -55,17 +55,6 @@ public class Terminal {
         }
     }
 
-    static void deleteFolder(File file) {
-        for (File sub : file.listFiles()) {
-            if (sub.isDirectory()) {
-                deleteFolder(sub);
-            } else {
-                sub.delete();
-            }
-        }
-        file.delete();
-    }
-
     public boolean rmdir(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
         if (destinationPath.length() == 0 || !file.exists())
@@ -74,7 +63,7 @@ public class Terminal {
             throw new Exception(String.format("failed to remove '%s': Not a directory", destinationPath));
 
         try {
-            deleteFolder(file);
+            file.delete();
         } catch (Exception e) {
             System.out.println(e);
             return false;
@@ -82,9 +71,11 @@ public class Terminal {
         return true;
     }
 
-    public boolean touch(String destinationPath) {
+    public boolean touch(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
-        if (!file.getParentFile().exists() || file.isDirectory()) return false;
+        if (destinationPath.length() == 0 || !file.getParentFile().exists())
+            throw new Exception(String.format("cannot touch '%s': No such file or directory", destinationPath));
+
         try {
             if (!file.createNewFile()) return false;
         } catch (Exception e) {
@@ -99,13 +90,21 @@ public class Terminal {
         return file.listFiles();
     }
 
-    public File[] ls(String destinationPath) {
+    public File[] ls(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
+        if (destinationPath.length() == 0 || !file.exists())
+            throw new Exception(String.format("cannot access '%s': No such file or directory", destinationPath));
+
         return file.listFiles();
     }
 
-    public boolean cd(String destinationSubDirectory) {
+    public boolean cd(String destinationSubDirectory) throws Exception {
         File file = makeFile(destinationSubDirectory);
+        if (destinationSubDirectory.length() == 0 || !file.exists())
+            throw new Exception(String.format("%s: No such file or directory", destinationSubDirectory));
+        if (!file.isDirectory())
+            throw new Exception(String.format("%s: Not a directory", destinationSubDirectory));
+
         currentPath = Paths.get(file.getAbsolutePath()).normalize();
         return true;
     }
@@ -114,10 +113,6 @@ public class Terminal {
         return getCurrentPath().toString();
     }
 
-    public static void main(String args[]){
-        Terminal terminal = new Terminal();
-        System.out.println(terminal.cd("./downloads/books/../../games"));
-    }
+    
 }
-
 
