@@ -137,7 +137,7 @@ public class Terminal {
         return getCurrentPath().toString();
     }
 
-    // REQUIRES: The destination path must be valid and must point to a file and not not a directory.
+    // REQUIRES: The destination path must be valid and must point to a file and not a directory.
     // EFFECTS: Writes the given content to a file and appends it if append is true else it overwrites.
     public boolean outputRedirect(String destinationPath, List<String> content, boolean append) throws Exception {
         File file = makeFile(destinationPath);
@@ -155,6 +155,8 @@ public class Terminal {
         return true;
     }
 
+    // REQUIRES: The destination path must be valid and must point to a file and not a directory.
+    // EFFECTS: Reads the given file and returns a list of all its lines.
     public List<String> inputRedirect(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
         if (destinationPath.length() == 0 || !file.exists())
@@ -165,6 +167,7 @@ public class Terminal {
         List<String> lines = Files.readAllLines(Paths.get(destinationPath));
         return lines;
     }
+
     public static void main(String[] args) throws Exception {
         // use cases for outputRedirect & inputRedirect
         Terminal terminal = new Terminal();
