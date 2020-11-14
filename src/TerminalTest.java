@@ -1,4 +1,8 @@
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -222,6 +226,24 @@ public class TerminalTest {
         }
     }
 
+    @Test
+    public  void testCat() throws IOException {
+        String Content1 = "This is the first file\n";
+        String Content2 = "This is the second file\n";
+        ArrayList<String>ans = new ArrayList<>();
+        ans.add(Content1);
+        ans.add(Content2);
+        Path path1 = Path.of("D:\\dir1\\sub-dir1\\file.txt");
+        Path path2 = Path.of("D:\\dir1\\sub-dir1\\file2.txt");
+        Files.writeString(path1,Content1);
+        Files.writeString(path2,Content2);
+        ArrayList<String> files = new ArrayList<>();
+        files.add("D:\\dir1\\sub-dir1\\file.txt");
+        files.add("D:\\dir1\\sub-dir1\\file2.txt");
+        for (int i = 0; i < 2; i++) {
+            assertEquals(ans.get(i).trim(), terminal.cat(files).get(i));
+        }
+    }
 
 
 

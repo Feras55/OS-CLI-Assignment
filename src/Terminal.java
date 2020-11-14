@@ -1,13 +1,13 @@
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class Terminal {
     Path currentPath;
@@ -24,10 +24,6 @@ public class Terminal {
             file = new File(curPath, destinationPath);
         }
         return file;
-    }
-
-    public Path getCurrentPath() {
-        return currentPath;
     }
 
     // REQUIRES: Path must be valid and directory can't be already exists
@@ -168,14 +164,49 @@ public class Terminal {
         return lines;
     }
 
+    public static List<String> cat (ArrayList<String> files) throws IOException {
+        List<String> content = new ArrayList<>();
+        try{
+
+            for (String Filepath:files) {
+                List<String> lines = Collections.emptyList();
+                 lines = Files.readAllLines(Paths.get(Filepath), StandardCharsets.UTF_8);
+                content.addAll(lines);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return content;
+            }
+
+    // <editor-fold defaultstate="collapsed" desc="GETTER & SETTERS">
+
+    public Path getCurrentPath() {
+        return currentPath;
+    }
+
+    public void setCurrentPath(Path currentPath) {
+        this.currentPath = currentPath;
+    }
+
+    // </editor-fold>
+
     public static void main(String[] args) throws Exception {
         // use cases for outputRedirect & inputRedirect
         Terminal terminal = new Terminal();
-        File[] files = terminal.ls("D:\\programs");
-        List<String> strings = new ArrayList<>();
-        for (File file : files) strings.add(file.toString());
-        terminal.outputRedirect("D:\\demo\\text.txt", strings, true);
-        terminal.inputRedirect("D:\\demo\\text.txt").forEach(line -> System.out.println(line));
+        ArrayList<String>paths = new ArrayList<>();
+        paths.add("D:\\myTest\\file1.txt");
+        paths.add("D:\\myTest\\file2.txt");
+        List<String> lines = cat(paths);
+        for(String line: lines){
+            System.out.println("" + line);
+        }
+
+//        File[] files = terminal.ls("D:\\programs");
+//        List<String> strings = new ArrayList<>();
+//        for (File file : files) strings.add(file.toString());
+//        terminal.outputRedirect("D:\\demo\\text.txt", strings, true);
+//        terminal.inputRedirect("D:\\demo\\text.txt").forEach(line -> System.out.println(line));
     }
 }
 
