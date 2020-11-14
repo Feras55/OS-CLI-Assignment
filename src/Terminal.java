@@ -214,6 +214,16 @@ public class Terminal {
         }
         return false;
     }
+    public static boolean mv(ArrayList<String> args) {
+        if(args.size()<2 ) {
+            return false;
+        }
+        File src = new File(currentPath.toString(),args.get(0));
+        File dst = new File(currentPath.toString(),args.get(1));
+        if(!src.exists()) return false;
+        return src.renameTo(dst);
+
+    }
     // </editor-fold>
 
     public static void main(String[] args) throws Exception {
