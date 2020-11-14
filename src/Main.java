@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -5,7 +6,7 @@ import java.util.regex.Pattern;
 public class Main {
     static Parser parser;
 
-    public boolean commandsValidator(String cmd) throws Exception {
+    public static boolean commandsValidator(String cmd) throws Exception {
         var args = parser.getArgument();
         switch (cmd) {
             case "mkdir":
@@ -19,10 +20,13 @@ public class Main {
                 }
                 return true;
             case "ls":
+                File[] toPrint;
                 if (args.size() == 0)
-                    Terminal.ls();
+                   toPrint = Terminal.ls();
                 else
-                    Terminal.ls(args.get(0));
+                   toPrint = Terminal.ls(args.get(0));
+                for(var file : toPrint)
+                    System.out.println(file.getName());
                 return true;
             case "cd":
                 return Terminal.cd(args.size() == 0 ? "" : args.get(0));
@@ -37,6 +41,9 @@ public class Main {
                 return Terminal.mv(args);
             case "more":
                 return Terminal.more(args.size() == 0 ? "" : args.get(0));
+            case "date":
+                System.out.println(Terminal.date());
+                return true;
 
         }
         System.out.println("bash:" + cmd + ": command not found");
@@ -76,21 +83,20 @@ public class Main {
                 break;
             }
             try {
+                command +="|";
                 String[] commands;
-                if (command.contains("|")) {
-                    commands = command.split(Pattern.quote("|"));
-                } else {
-                    commands = new String[1];
-                    commands[0] = command;
-                }
+                commands = command.split(Pattern.quote("|"));
                 for (String str : commands) {
                     parser.parse(str);
-                    arguments = parser.getArgument();
-                    command = parser.getCmd();
+                    System.out.print("got:-"+parser.cmd+"-");
+                    for (var xxx  : parser.getArgument())
+                        System.out.println(xxx);
+                    commandsValidator(parser.cmd);
+
                 }
 
             } catch (Exception e) {
-                System.out.println(e);
+                e.printStackTrace();
 
             }
 

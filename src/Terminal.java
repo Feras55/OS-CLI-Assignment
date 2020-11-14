@@ -5,16 +5,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Terminal {
-    static Path currentPath;
+    static Path currentPath = Paths.get("D:\\test");
 
     public Terminal() {
-        currentPath = Paths.get("D:\\");
+        currentPath = Paths.get("D:\\test");
     }
 
     // EFFECTS: returns a file pointing to the given path.
@@ -26,7 +24,12 @@ public class Terminal {
         }
         return file;
     }
+    public static String date(){
+        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+        Date date = new Date(System.currentTimeMillis());
+        return date.toString();
 
+    }
     // REQUIRES: Path must be valid and directory can't be already exists
     // EFFECTS: creates a new directory at the given path.
     public static boolean mkdir(String destinationPath) throws Exception {
@@ -125,7 +128,7 @@ public class Terminal {
         if (!file.isDirectory())
             throw new Exception(String.format("%s: Not a directory", destinationSubDirectory));
 
-        currentPath = Paths.get(file.getAbsolutePath()).normalize();
+        currentPath = Paths.get(file.getAbsolutePath());
         return true;
     }
 
@@ -171,7 +174,7 @@ public class Terminal {
 
             for (String Filepath : files) {
                 List<String> lines = Collections.emptyList();
-                lines = Files.readAllLines(Paths.get(Filepath), StandardCharsets.UTF_8);
+                lines = Files.readAllLines(Paths.get(currentPath.toString()+"\\"+Filepath), StandardCharsets.UTF_8);
                 content.addAll(lines);
             }
         } catch (Exception e) {

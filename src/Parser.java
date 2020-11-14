@@ -5,6 +5,7 @@ public class Parser {
     String cmd;
 
     public boolean parse (String input){
+        args.clear();
         try {
             if (input.isEmpty()) return false;
             String[] strings = input.trim().split("\\s+");
