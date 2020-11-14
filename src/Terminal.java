@@ -10,14 +10,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class Terminal {
-    Path currentPath;
+    static Path currentPath;
 
     public Terminal() {
         currentPath = Paths.get("D:\\");
     }
 
     // EFFECTS: returns a file pointing to the given path.
-    private File makeFile(String destinationPath) {
+    private static File makeFile(String destinationPath) {
         File file = new File(destinationPath);
         if (!file.isAbsolute()) {
             String curPath = getCurrentPath().toString();
@@ -28,7 +28,7 @@ public class Terminal {
 
     // REQUIRES: Path must be valid and directory can't be already exists
     // EFFECTS: creates a new directory at the given path.
-    public boolean mkdir(String destinationPath) throws Exception {
+    public static boolean mkdir(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
 
         if (destinationPath.length() == 0 || !file.getParentFile().exists())
@@ -60,7 +60,7 @@ public class Terminal {
 
     // REQUIRES: Path must be valid and must be a directory
     // EFFECTS: removes the the directory at the given path if its empty. returns true if successful else false.
-    public boolean rmdir(String destinationPath) throws Exception {
+    public static boolean rmdir(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
         if (destinationPath.length() == 0 || !file.exists())
             throw new Exception(String.format("failed to remove '%s': No such file or directory", destinationPath));
@@ -79,7 +79,7 @@ public class Terminal {
 
     // REQUIRES: Path must be valid
     // EFFECTS: creates a new file at the given path.
-    public boolean touch(String destinationPath) throws Exception {
+    public static boolean touch(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
         if (destinationPath.length() == 0 || !file.getParentFile().exists())
             throw new Exception(String.format("cannot touch '%s': No such file or directory", destinationPath));
@@ -95,14 +95,14 @@ public class Terminal {
 
     // REQUIRES: Path must be valid
     // EFFECTS: returns a list of files and folders inside the current path.
-    public File[] ls() {
+    public static File[] ls() {
         File file = new File(getCurrentPath().toString());
         return file.listFiles();
     }
 
     // REQUIRES: Path must be valid
     // EFFECTS: returns a list of files and folders inside the given path.
-    public File[] ls(String destinationPath) throws Exception {
+    public static File[] ls(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
         if (destinationPath.length() == 0 || !file.exists())
             throw new Exception(String.format("cannot access '%s': No such file or directory", destinationPath));
@@ -117,7 +117,7 @@ public class Terminal {
     // REQUIRES: Path must be valid and must point to a directory.
     // MODIFIES: this
     // EFFECTS: Moves the current path according to the given path.
-    public boolean cd(String destinationSubDirectory) throws Exception {
+    public static boolean cd(String destinationSubDirectory) throws Exception {
         File file = makeFile(destinationSubDirectory);
         if (destinationSubDirectory.length() == 0 || !file.exists())
             throw new Exception(String.format("%s: No such file or directory", destinationSubDirectory));
@@ -129,13 +129,13 @@ public class Terminal {
     }
 
     // EFFECTS: Prints the current working directory.
-    public String pwd() {
+    public static String pwd() {
         return getCurrentPath().toString();
     }
 
     // REQUIRES: The destination path must be valid and must point to a file and not a directory.
     // EFFECTS: Writes the given content to a file and appends it if append is true else it overwrites.
-    public boolean outputRedirect(String destinationPath, List<String> content, boolean append) throws Exception {
+    public static boolean outputRedirect(String destinationPath, List<String> content, boolean append) throws Exception {
         File file = makeFile(destinationPath);
         if (destinationPath.length() == 0 || !file.getParentFile().exists())
             throw new Exception(String.format("%s: No such file or directory", destinationPath));
@@ -153,7 +153,7 @@ public class Terminal {
 
     // REQUIRES: The destination path must be valid and must point to a file and not a directory.
     // EFFECTS: Reads the given file and returns a list of all its lines.
-    public List<String> inputRedirect(String destinationPath) throws Exception {
+    public static List<String> inputRedirect(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
         if (destinationPath.length() == 0 || !file.exists())
             throw new Exception(String.format("%s: No such file or directory", destinationPath));
@@ -181,12 +181,12 @@ public class Terminal {
 
     // <editor-fold defaultstate="collapsed" desc="GETTER & SETTERS">
 
-    public Path getCurrentPath() {
+    public static Path  getCurrentPath() {
         return currentPath;
     }
 
-    public void setCurrentPath(Path currentPath) {
-        this.currentPath = currentPath;
+    public static void setCurrentPath(Path cp) {
+        currentPath = cp;
     }
 
     // </editor-fold>

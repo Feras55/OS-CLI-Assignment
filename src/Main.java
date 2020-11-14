@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-    public boolean commandsValidator(String cmd) {
-        return true;
+    public boolean commandsValidator(String cmd) throws Exception{
+      throw new Exception();
     }
 
     public boolean ArgumentsValidator(ArrayList<String> arguments, String cmd) {
@@ -25,12 +25,12 @@ public class Main {
 
         }
 
-
+        return true;
     }
 
     public static void main(String[] args) {
         boolean terminate = false;
-        Terminal terminal = new Terminal();
+
         Parser parser = new Parser();
         Scanner sc = new Scanner(System.in);
         ArrayList<String> arguments = new ArrayList<String>();
