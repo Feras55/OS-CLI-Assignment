@@ -224,6 +224,16 @@ public class Terminal {
         return src.renameTo(dst);
 
     }
+    public static boolean more(String filename) throws  IOException{
+        File file = new File(currentPath.toString(),filename);
+        if(file.exists()){
+            for(var line :Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8)){
+                System.out.println(line);
+            }
+            return  true;
+        }
+        return false;
+    }
     // </editor-fold>
 
     public static void main(String[] args) throws Exception {
