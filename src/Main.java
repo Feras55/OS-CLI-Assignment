@@ -1,40 +1,36 @@
-import jdk.jshell.spi.ExecutionControl;
-
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Scanner;
 public class Main {
 static Parser parser;
     public boolean commandsValidator(String cmd) throws Exception{
-        if(cmd.equals("mkdir")){
-            return Terminal.mkdir(parser.getArgument().size()==0? "" : parser.getArgument().get(0));
+        switch (cmd) {
+            case "mkdir":
+                return Terminal.mkdir(parser.getArgument().size() == 0 ? "" : parser.getArgument().get(0));
+            case "rmdir":
+                return Terminal.rmdir(parser.getArgument().size() == 0 ? "" : parser.getArgument().get(0));
+            case "cat":
+                var read = Terminal.cat(parser.getArgument());
+                for (var line : read) {
+                    System.out.println(line);
+                }
+                return true;
+            case "ls":
+                if (parser.getArgument().size() == 0)
+                    Terminal.ls();
+                else
+                    Terminal.ls(parser.getArgument().get(0));
+               return true;
+            case "cd":
+                return Terminal.cd(parser.getArgument().size() == 0 ? "" : parser.getArgument().get(0));
+            case "pwd":
+                Terminal.pwd();
+                return true;
+            case "touch":
+                return Terminal.touch(parser.getArgument().size() == 0 ? "" : parser.getArgument().get(0));
+            case "rm":
+                return Terminal.rm(parser.getArgument());
         }
-        else if(cmd.equals("rmdir")){
-            return Terminal.rmdir(parser.getArgument().size()==0? "" : parser.getArgument().get(0));
-        }
-        else if(cmd.equals("cat")){
-            var read = Terminal.cat(parser.getArgument());
-            for (var line:read) {
-                System.out.println(line);
-            }
-            return true;
-        }
-        else if(cmd.equals("ls")){
-            if(parser.getArgument().size()==0)
-                Terminal.ls();
-            else
-                Terminal.ls(parser.getArgument().get(0));
-            return true;
-        }
-        else if(cmd.equals("cd")){
-            return Terminal.cd(parser.getArgument().size()==0? "" : parser.getArgument().get(0));
-        }
-        else if(cmd.equals("pwd")){
-            Terminal.pwd();
-            return true;
-        }else if(cmd.equals("")){
-            return Terminal.touch(parser.getArgument().size()==0? "" : parser.getArgument().get(0));
-        }
+        System.out.println("bash:" + cmd +": command not found");
         return false;
     }
 /*
@@ -58,18 +54,15 @@ static Parser parser;
     }
 */
     public static void main(String[] args) {
-        boolean terminate = false;
-
         parser = new Parser();
         Scanner sc = new Scanner(System.in);
-        ArrayList<String> arguments = new ArrayList<String>();
-        String cmd = new String();
+        ArrayList<String> arguments;
+        String cmd ;
 
-        while (!terminate) {
+        while (true) {
             System.out.println("%");
             String command = sc.nextLine();
             if (command.equals("exit")) {
-                terminate = true;
                 break;
             }
             try {
@@ -81,8 +74,6 @@ static Parser parser;
 
             } catch (Exception e) {
                 System.out.println(e);
-                continue;
-
 
             }
 

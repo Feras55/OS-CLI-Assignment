@@ -8,6 +8,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 public class Terminal {
     static Path currentPath;
@@ -106,7 +107,7 @@ public class Terminal {
         File file = makeFile(destinationPath);
         if (destinationPath.length() == 0 || !file.exists())
             throw new Exception(String.format("cannot access '%s': No such file or directory", destinationPath));
-        if (!file.isDirectory()){
+        if (!file.isDirectory()) {
             File[] files = new File[1];
             files[0] = file;
             return files;
@@ -164,24 +165,24 @@ public class Terminal {
         return lines;
     }
 
-    public static List<String> cat (ArrayList<String> files) throws IOException {
+    public static List<String> cat(ArrayList<String> files) throws IOException {
         List<String> content = new ArrayList<>();
-        try{
+        try {
 
-            for (String Filepath:files) {
+            for (String Filepath : files) {
                 List<String> lines = Collections.emptyList();
-                 lines = Files.readAllLines(Paths.get(Filepath), StandardCharsets.UTF_8);
+                lines = Files.readAllLines(Paths.get(Filepath), StandardCharsets.UTF_8);
                 content.addAll(lines);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return content;
-            }
+    }
 
     // <editor-fold defaultstate="collapsed" desc="GETTER & SETTERS">
 
-    public static Path  getCurrentPath() {
+    public static Path getCurrentPath() {
         return currentPath;
     }
 
@@ -189,16 +190,40 @@ public class Terminal {
         currentPath = cp;
     }
 
+    public static boolean rm(ArrayList<String> option) throws Exception {
+        if (option.size() < 2) {
+            System.out.println("rm: missing operand\n" +
+                    "Try 'rm --help' for more information.");
+            return true;
+        }
+        if (option.get(0).equals("-i")) {
+            File file = makeFile(option.get(1));
+            if (!file.exists())
+                throw new Exception(String.format("cannot access '%s': No such file or directory", option.get(1)));
+            if (!file.isDirectory()) {
+                System.out.println("remove regular file 'y'?");
+                Scanner input = new Scanner(System.in);
+                if (input.nextLine().toLowerCase().equals("y")) {
+                    file.delete();
+                    return true;
+                }
+            } else {
+                System.out.println("rm: cannot remove "+option.get(1) +": Is a directory");
+                return false;
+            }
+        }
+        return false;
+    }
     // </editor-fold>
 
     public static void main(String[] args) throws Exception {
         // use cases for outputRedirect & inputRedirect
         Terminal terminal = new Terminal();
-        ArrayList<String>paths = new ArrayList<>();
+        ArrayList<String> paths = new ArrayList<>();
         paths.add("D:\\myTest\\file1.txt");
         paths.add("D:\\myTest\\file2.txt");
         List<String> lines = cat(paths);
-        for(String line: lines){
+        for (String line : lines) {
             System.out.println("" + line);
         }
 
