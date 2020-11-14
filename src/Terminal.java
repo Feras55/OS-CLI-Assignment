@@ -1,11 +1,9 @@
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -18,10 +16,7 @@ public class Terminal {
         currentPath = Paths.get("D:\\");
     }
 
-    public Path getCurrentPath() {
-        return currentPath;
-    }
-
+    // EFFECTS: returns a file pointing to the given path.
     private File makeFile(String destinationPath) {
         File file = new File(destinationPath);
         if (!file.isAbsolute()) {
@@ -31,6 +26,12 @@ public class Terminal {
         return file;
     }
 
+    public Path getCurrentPath() {
+        return currentPath;
+    }
+
+    // REQUIRES: Path must be valid and directory can't be already exists
+    // EFFECTS: creates a new directory at the given path.
     public boolean mkdir(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
 
@@ -48,6 +49,7 @@ public class Terminal {
         return true;
     }
 
+    // EFFECTS: clears the terminal.
     public static void clear() {
         try {
             if (System.getProperty("os.name").contains("Windows")) {
@@ -60,17 +62,8 @@ public class Terminal {
         }
     }
 
-    static void deleteFolder(File file) {
-        for (File sub : file.listFiles()) {
-            if (sub.isDirectory()) {
-                deleteFolder(sub);
-            } else {
-                sub.delete();
-            }
-        }
-        file.delete();
-    }
-
+    // REQUIRES: Path must be valid and must be a directory
+    // EFFECTS: removes the the directory at the given path if its empty. returns true if successful else false.
     public boolean rmdir(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
         if (destinationPath.length() == 0 || !file.exists())
@@ -79,7 +72,8 @@ public class Terminal {
             throw new Exception(String.format("failed to remove '%s': Not a directory", destinationPath));
 
         try {
-            deleteFolder(file);
+            if (!file.delete())
+                return false;
         } catch (Exception e) {
             System.out.println(e);
             return false;
@@ -87,9 +81,13 @@ public class Terminal {
         return true;
     }
 
-    public boolean touch(String destinationPath) {
+    // REQUIRES: Path must be valid
+    // EFFECTS: creates a new file at the given path.
+    public boolean touch(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
-        if (!file.getParentFile().exists() || file.isDirectory()) return false;
+        if (destinationPath.length() == 0 || !file.getParentFile().exists())
+            throw new Exception(String.format("cannot touch '%s': No such file or directory", destinationPath));
+
         try {
             if (!file.createNewFile()) return false;
         } catch (Exception e) {
@@ -99,46 +97,85 @@ public class Terminal {
         return true;
     }
 
+    // REQUIRES: Path must be valid
+    // EFFECTS: returns a list of files and folders inside the current path.
     public File[] ls() {
         File file = new File(getCurrentPath().toString());
         return file.listFiles();
     }
 
-    public File[] ls(String destinationPath) {
+    // REQUIRES: Path must be valid
+    // EFFECTS: returns a list of files and folders inside the given path.
+    public File[] ls(String destinationPath) throws Exception {
         File file = makeFile(destinationPath);
+        if (destinationPath.length() == 0 || !file.exists())
+            throw new Exception(String.format("cannot access '%s': No such file or directory", destinationPath));
+        if (!file.isDirectory()){
+            File[] files = new File[1];
+            files[0] = file;
+            return files;
+        }
         return file.listFiles();
     }
 
-    public boolean cd(String destinationSubDirectory) {
+    // REQUIRES: Path must be valid and must point to a directory.
+    // MODIFIES: this
+    // EFFECTS: Moves the current path according to the given path.
+    public boolean cd(String destinationSubDirectory) throws Exception {
         File file = makeFile(destinationSubDirectory);
+        if (destinationSubDirectory.length() == 0 || !file.exists())
+            throw new Exception(String.format("%s: No such file or directory", destinationSubDirectory));
+        if (!file.isDirectory())
+            throw new Exception(String.format("%s: Not a directory", destinationSubDirectory));
+
         currentPath = Paths.get(file.getAbsolutePath()).normalize();
         return true;
     }
 
+    // EFFECTS: Prints the current working directory.
     public String pwd() {
         return getCurrentPath().toString();
     }
 
+    // REQUIRES: The destination path must be valid and must point to a file and not a directory.
+    // EFFECTS: Writes the given content to a file and appends it if append is true else it overwrites.
+    public boolean outputRedirect(String destinationPath, List<String> content, boolean append) throws Exception {
+        File file = makeFile(destinationPath);
+        if (destinationPath.length() == 0 || !file.getParentFile().exists())
+            throw new Exception(String.format("%s: No such file or directory", destinationPath));
+        if (file.isDirectory())
+            throw new Exception(String.format("%s: Is a directory", destinationPath));
 
-    public ArrayList<String> cat (ArrayList<String> files) throws IOException {
-        ArrayList<String> content = new ArrayList<>();
-        try{
-
-            for (String Filepath:files) {
-                List<String> lines = Files.readAllLines(Paths.get(Filepath).getFileName(), StandardCharsets.UTF_8);
-                lines.add("\n");
-                content.addAll(lines);
-            }
-        }catch(Exception e){
-            e.printStackTrace();
+        if (!append) file.delete();
+        file.createNewFile();
+        for (int i = 0; i < content.size(); ++i) {
+            Files.writeString(Paths.get(destinationPath), content.get(i) + System.lineSeparator(),
+                    StandardOpenOption.APPEND);
         }
-        return content;
+        return true;
     }
 
-    public static void main(String args[]){
+    // REQUIRES: The destination path must be valid and must point to a file and not a directory.
+    // EFFECTS: Reads the given file and returns a list of all its lines.
+    public List<String> inputRedirect(String destinationPath) throws Exception {
+        File file = makeFile(destinationPath);
+        if (destinationPath.length() == 0 || !file.exists())
+            throw new Exception(String.format("%s: No such file or directory", destinationPath));
+        if (file.isDirectory())
+            throw new Exception(String.format("%s: Is a directory", destinationPath));
+
+        List<String> lines = Files.readAllLines(Paths.get(destinationPath));
+        return lines;
+    }
+
+    public static void main(String[] args) throws Exception {
+        // use cases for outputRedirect & inputRedirect
         Terminal terminal = new Terminal();
-        System.out.println(terminal.cd("./downloads/books/../../games"));
+        File[] files = terminal.ls("D:\\programs");
+        List<String> strings = new ArrayList<>();
+        for (File file : files) strings.add(file.toString());
+        terminal.outputRedirect("D:\\demo\\text.txt", strings, true);
+        terminal.inputRedirect("D:\\demo\\text.txt").forEach(line -> System.out.println(line));
     }
 }
-
 
