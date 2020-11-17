@@ -250,11 +250,7 @@ public class Terminal {
             System.out.println("" + line);
         }
 
-//        File[] files = terminal.ls("D:\\programs");
-//        List<String> strings = new ArrayList<>();
-//        for (File file : files) strings.add(file.toString());
-//        terminal.outputRedirect("D:\\demo\\text.txt", strings, true);
-//        terminal.inputRedirect("D:\\demo\\text.txt").forEach(line -> System.out.println(line));
+
     }
 }
 

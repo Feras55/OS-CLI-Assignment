@@ -31,7 +31,7 @@ public class Main {
             case "cd":
                 return Terminal.cd(args.size() == 0 ? "" : args.get(0));
             case "pwd":
-                Terminal.pwd();
+                System.out.println( Terminal.pwd());
                 return true;
             case "touch":
                 return Terminal.touch(args.size() == 0 ? "" : args.get(0));
@@ -50,26 +50,7 @@ public class Main {
         return false;
     }
 
-    /*
-        public boolean ArgumentsValidator(ArrayList<String> arguments, String cmd) {
-            if (arguments.size() == 1) {
-                if (cmd == "mkdir" || cmd == "rmdir" || cmd == "touch" ||
-                        cmd == "ls" || cmd == "cd" || cmd == "inputRedirect" || cmd == "cat") {
-                    return true;
-                }
-            } else if (arguments.size() == 0) {
-                if (cmd == "clear" || cmd == "ls" || cmd == "pwd") {
-                    return true;
-                }
-            } else if (arguments.size() > 1) {
-                if (cmd == "cat")
-                    return true;
 
-            }
-
-            return true;
-        }
-    */
     public static void main(String[] args) {
         parser = new Parser();
         Scanner sc = new Scanner(System.in);
@@ -88,7 +69,6 @@ public class Main {
                 commands = command.split(Pattern.quote("|"));
                 for (String str : commands) {
                     parser.parse(str);
-                    System.out.print("got:-"+parser.cmd+"-");
                     for (var xxx  : parser.getArgument())
                         System.out.println(xxx);
                     commandsValidator(parser.cmd);
